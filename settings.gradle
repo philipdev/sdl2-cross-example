@@ -1,4 +1,4 @@
-gradle.ext.sdkVersion = 19
+gradle.ext.sdkVersion = 21
 gradle.ext.minSdkVersion = 13
 gradle.ext.libDistributionRoot = '../distribution'
 
@@ -9,3 +9,5 @@ include ':SDL2_png'
 include ':SDL2_image'
 include ':SDL2_mixer'
 include ':main'
+include ':windows'
+

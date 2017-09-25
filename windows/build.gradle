@@ -1,0 +1,109 @@
+apply plugin: "cpp"
+ 
+ 
+
+model {
+	repositories {
+			libs(PrebuiltLibraries) {
+				SDL2Win {
+					headers.srcDir "../SDL2/include"
+					binaries.withType(SharedLibraryBinary) {
+						if (targetPlatform.operatingSystem.windows) {
+							sharedLibraryFile = file("../prebuilt/SDL2/lib/windows/${targetPlatform.architecture.name}/SDL2.dll")
+							sharedLibraryLinkFile = file("../prebuilt/SDL2/lib/windows/${targetPlatform.architecture.name}/SDL2.lib") 
+						}
+						binaries.withType(PrebuiltStaticLibraryBinary) {
+							staticLibraryFile = file("../prebuilt/SDL2/lib/windows/${targetPlatform.architecture.name}/SDL2.lib")
+						}	
+					}
+				}
+				SDL2WinMain {
+					headers.srcDir "../SDL2/include"
+					binaries.withType(SharedLibraryBinary) {
+						if (targetPlatform.operatingSystem.windows) {
+							sharedLibraryFile = file("../prebuilt/SDL2/lib/windows/${targetPlatform.architecture.name}/SDL2.dll")
+							sharedLibraryLinkFile = file("../prebuilt/SDL2/lib/windows/${targetPlatform.architecture.name}/SDL2main.lib") 
+						}
+						binaries.withType(PrebuiltStaticLibraryBinary) {
+							staticLibraryFile = file("../prebuilt/SDL2/lib/windows/${targetPlatform.architecture}/SDL2main.lib")
+						}
+					}
+				}
+				SDL2WinImage {
+					headers.srcDir "../SDL2_image/include"
+					binaries.withType(SharedLibraryBinary) {
+						if (targetPlatform.operatingSystem.windows) {
+							sharedLibraryFile = file("../prebuilt/SDL2_image/lib/windows/${targetPlatform.architecture.name}/SDL2_image.dll")
+							sharedLibraryLinkFile = file("../prebuilt/SDL2_image/lib/windows/${targetPlatform.architecture.name}/SDL2_image.lib") 
+						}
+						//binaries.withType(PrebuiltStaticLibraryBinary) {
+						//	staticLibraryFile = file("../prebuilt/SDL2_image/lib/windows/${targetPlatform.architecture.name}/SDL2.lib")
+						//}	
+					}
+				}
+				SDL2WinMixer {
+					headers.srcDir "../SDL2_mixer/include"
+					binaries.withType(SharedLibraryBinary) {
+						if (targetPlatform.operatingSystem.windows) {
+							sharedLibraryFile = file("../prebuilt/SDL2_mixer/lib/windows/${targetPlatform.architecture.name}/SDL2_mixer.dll")
+							sharedLibraryLinkFile = file("../prebuilt/SDL2_mixer/lib/windows/${targetPlatform.architecture.name}/SDL2_mixer.lib") 
+						}
+					}
+				}
+				
+			}
+	}
+	components {
+		main(NativeExecutableSpec) {
+			sources {
+				cpp {
+					source {
+						srcDir "../main/src"
+						include "*.cpp"
+					 }
+					lib library: 'SDL2WinMain', linkage: 'shared'
+					lib library: 'SDL2Win', linkage: 'static'
+					lib library: 'SDL2WinImage', linkage: 'shared'
+					lib library: 'SDL2WinMixer', linkage: 'shared'
+
+					
+				}
+			}
+		}		
+
+				
+	}
+	binaries {
+		withType(SharedLibraryBinarySpec) {
+			if (toolChain in VisualCpp) {
+				cppCompiler.define "DLL_EXPORT" 
+					
+			}
+			
+		}
+		
+
+		withType(NativeBinarySpec) {
+			if (toolChain in VisualCpp) {
+				linker.args "/SUBSYSTEM:CONSOLE", "opengl32.lib"
+			}
+		}
+	}
+	
+}
+
+
+tasks.whenTaskAdded { installTask ->
+	if(installTask.name == 'installMainExecutable') {
+		installTask.doLast {
+			task copyAssets(type : Copy) {
+				from '../app/src/main/assets'
+				into installTask.destinationDir.getPath() + '/lib'
+			}	
+			copyAssets.execute()
+		}
+	}
+}
+
+
+

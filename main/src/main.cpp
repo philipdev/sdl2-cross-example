@@ -51,10 +51,9 @@ int main(int argc, char* argv[]) {
     // Check that the window was successfully created
     if (window == NULL) {
         // In the case that the window could not be made...
-        printf("Could not create window: %s\n", SDL_GetError());
+       // printf("Could not create window: %s\n", SDL_GetError());
         return 1;
     }
-
     if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1 ) {
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                      "Couldn't open mixer: %s", SDL_GetError());
@@ -63,10 +62,9 @@ int main(int argc, char* argv[]) {
 
     Mix_Chunk *sample = Mix_LoadWAV("cuckoo.wav");
     if (sample == NULL) {
-        fprintf(stderr, "Unable to load wave file\n");
+        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unable to load wave file\n");
         return 3;
     }
-
 
     // Setup renderer
     SDL_Renderer* renderer = NULL;
@@ -144,10 +142,12 @@ int main(int argc, char* argv[]) {
                 }
                 break;
 
-            case SDL_FINGERDOWN: {
+			case SDL_MOUSEBUTTONDOWN: {
+
+				SDL_Log("Mouse down");
                 Mix_PlayChannel(-1, sample, 0);
-                dstrect.x = event.tfinger.x * loadedSurface->w;
-                dstrect.y = event.tfinger.y * loadedSurface->h;
+                dstrect.x = event.button.x * loadedSurface->w;
+                dstrect.y = event.button.y * loadedSurface->h;
                 SDL_RenderCopy(renderer, texture, NULL, &dstrect);
                 SDL_RenderPresent(renderer);
                 break;

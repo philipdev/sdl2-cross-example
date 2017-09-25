@@ -3,6 +3,30 @@ apply plugin: 'com.android.model.native'
 model {
      repositories {
         libs(PrebuiltLibraries) {
+			SDL2Win {
+				headers.srcDir "external/SDL2/include"
+				binaries.withType(SharedLibraryBinary) {
+					if (targetPlatform.operatingSystem.windows) {
+						sharedLibraryFile = file("prebuilt/SDL2/lib/windows/${targetPlatform.architecture.name}/SDL2.dll")
+						sharedLibraryLinkFile = file("prebuilt/SDL2/lib/windows/${targetPlatform.architecture.name}/SDL2.lib") 
+					}
+					binaries.withType(PrebuiltStaticLibraryBinary) {
+						staticLibraryFile = file("prebuilt/SDL2/lib/windows/${targetPlatform.architecture.name}/SDL2.lib")
+					}	
+				}
+			}
+			SDL2WinMain {
+				headers.srcDir "external/SDL2/include"
+				binaries.withType(SharedLibraryBinary) {
+					if (targetPlatform.operatingSystem.windows) {
+						sharedLibraryFile = file("prebuilt/SDL2/lib/windows/${targetPlatform.architecture.name}/SDL2.dll")
+						sharedLibraryLinkFile = file("prebuilt/SDL2/lib/windows/${targetPlatform.architecture.name}/SDL2main.lib") 
+					}
+					binaries.withType(PrebuiltStaticLibraryBinary) {
+						staticLibraryFile = file("prebuilt/SDL2/lib/windows/${targetPlatform.architecture}/SDL2main.lib")
+					}
+				}
+			}
             SDL2 {
                 headers.srcDir "../SDL2/include"
                 binaries.withType(SharedLibraryBinary) {
@@ -35,7 +59,9 @@ model {
             }
         }
     }
-
+	
+	
+	
    android {
         compileSdkVersion = gradle.sdkVersion
         buildToolsVersion = '25.0.3'
@@ -80,6 +106,7 @@ model {
 
     }
 }
+
 
 task(distributeLib, type : Copy) {
     // trigger build library
