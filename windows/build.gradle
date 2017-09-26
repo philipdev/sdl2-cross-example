@@ -82,7 +82,6 @@ model {
 			
 		}
 		
-
 		withType(NativeBinarySpec) {
 			if (toolChain in VisualCpp) {
 				linker.args "/SUBSYSTEM:CONSOLE", "opengl32.lib"
@@ -93,15 +92,34 @@ model {
 }
 
 
+
+
 tasks.whenTaskAdded { installTask ->
 	if(installTask.name == 'installMainExecutable') {
+		installTask.deleteAllActions()
+		
 		installTask.doLast {
 			task copyAssets(type : Copy) {
 				from '../app/src/main/assets'
-				into installTask.destinationDir.getPath() + '/lib'
+				into installTask.destinationDir.getPath()
 			}	
 			copyAssets.execute()
-		}
+			
+			task copyLibs(type:Copy) {
+				from installTask.libs.collect{ f -> f.getParent()}
+				into installTask.destinationDir.getPath() 
+				include '*.dll'
+			}
+			
+			copyLibs.execute()
+			
+			task copyExe(type:Copy) {
+				from installTask.executable
+				into installTask.destinationDir.getPath() 
+			}
+			copyExe.execute()
+			
+		}		
 	}
 }
 
